@@ -1,0 +1,287 @@
+openapi: 3.1.0
+info:
+  title: Github sync
+  description: ''
+  version: 2.0.0
+tags:
+  - name: Deployments
+paths:
+  /deployments:
+    get:
+      summary: Create a Deployment
+      deprecated: false
+      description: >-
+        Initiate a new deployment. A deployment is a containerized server
+        instance of an application version running on the Edgegap platform.
+        Update2
+      tags:
+        - Deployments
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Deployment'
+            examples:
+              '1':
+                value:
+                  application: my-app
+                  version: '1.0'
+                  users:
+                    - user_type: ip_address
+                      user_data:
+                        ip_address: 75.28.35.192
+                summary: Minimalist
+              '2':
+                value:
+                  application: my-app
+                  version: '1.0'
+                  users:
+                    - user_type: ip_address
+                      user_data:
+                        ip_address: 32.212.35.191
+                    - user_type: geo_coordinates
+                      user_data:
+                        latitude: 66.41845060675061
+                        longitude: 146.73996780605796
+                  environment_variables:
+                    - key: MAP_ID
+                      value: '1256'
+                      is_hidden: false
+                  tags:
+                    - some_tag_value1
+                    - some_tag_value2
+                  webhook_on_ready:
+                    url: https://my-webhook.com
+                  webhook_on_error:
+                    url: https://my-webhook.com
+                  webhook_on_terminated:
+                    url: https://mysterious-popularity.info/
+                summary: Advanced
+      responses:
+        '202':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  request_id:
+                    type: string
+                    examples:
+                      - a69f8e3e0555
+                    description: Request ID. Unique identifier of the deployment request
+                required:
+                  - request_id
+              example:
+                request_id: a69f8e3e0555
+          headers: {}
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                title: ''
+                type: object
+                properties:
+                  message:
+                    type: string
+                  details:
+                    type: object
+                    properties: {}
+                required:
+                  - message
+          headers: {}
+        '401':
+          description: ''
+          content:
+            application/json:
+              schema:
+                title: ''
+                type: object
+                properties:
+                  message:
+                    type: string
+                    examples:
+                      - This is an errror
+                  details:
+                    type: object
+                    properties: {}
+                required:
+                  - message
+                  - details
+          headers: {}
+        '422':
+          description: ''
+          content:
+            application/json:
+              schema:
+                title: ''
+                type: object
+                properties:
+                  request_id:
+                    type: string
+                    examples:
+                      - a69f8e3e0555
+                  message:
+                    type: string
+                required:
+                  - request_id
+                  - message
+          headers: {}
+      security: []
+webhooks: {}
+components:
+  schemas:
+    IpAddressUser:
+      type: object
+      properties:
+        user_type:
+          type: string
+          const: ip_address
+          description: Sepcify that the use type
+        user_data:
+          type: object
+          properties:
+            ip_address:
+              type: string
+              examples:
+                - 75.28.35.192
+                - 32.212.35.191
+              description: IP address of the user
+          required:
+            - ip_address
+      required:
+        - user_type
+        - user_data
+    GeoCoordinatesUser:
+      type: object
+      properties:
+        user_type:
+          type: string
+          const: geo_coordinates
+          description: Sepcify that the use type
+        user_data:
+          type: object
+          properties:
+            latitude:
+              type: number
+              format: double
+              minimum: -90
+              maximum: 90
+              description: Latitude of the user
+            longitude:
+              type: number
+              minimum: -180
+              maximum: 180
+              format: double
+              description: Longitude of the user
+          required:
+            - latitude
+            - longitude
+      required:
+        - user_type
+        - user_data
+    Deployment:
+      type: object
+      properties:
+        application:
+          type: string
+          description: Name of the application that will be deployed
+          examples:
+            - my-app
+        version:
+          type: string
+          description: Name of the version within the application that will be deployed
+          examples:
+            - '1.0'
+        users:
+          type: array
+          items:
+            oneOf:
+              - $ref: '#/components/schemas/IpAddressUser'
+              - $ref: '#/components/schemas/GeoCoordinatesUser'
+          minItems: 1
+          uniqueItems: true
+          title: users
+          description: >-
+            List of users. These users will be used to select the locations for
+            the deployment
+        environment_variables:
+          type: array
+          items:
+            type: object
+            properties:
+              key:
+                type: string
+                examples:
+                  - MAP_ID
+                minLength: 1
+                description: Environment variable key
+              value:
+                type: string
+                examples:
+                  - '1256'
+                description: Environment variable value
+              is_hidden:
+                type: boolean
+                description: An hidden environment variable is not shown in the UI
+            required:
+              - key
+              - value
+          description: List of environment variables to inject into the deployment
+        tags:
+          type: array
+          items:
+            type: string
+            examples:
+              - some_tag_value
+          description: List of tags to associate with the deployment
+        webhook_on_ready:
+          type: object
+          properties:
+            url:
+              type: string
+              format: uri
+              examples:
+                - https://my-webhook.com
+              description: Webhook URL
+          required:
+            - url
+          description: Webhook to call when the deployment is ready
+        webhook_on_error:
+          type: object
+          properties:
+            url:
+              type: string
+              format: uri
+              examples:
+                - https://my-webhook.com
+              description: Webhook URL
+          required:
+            - url
+          description: Webhook to call when the deployment is in error
+        webhook_on_terminated:
+          type: object
+          properties:
+            url:
+              type: string
+              format: uri
+              description: Webhook URL
+          required:
+            - url
+          description: Webhook to call when the deployment is terminated
+      required:
+        - application
+        - version
+        - users
+  securitySchemes:
+    Api Token:
+      type: apiKey
+      in: header
+      name: Authorization
+servers:
+  - url: https://api.edgegap.com/v2
+    description: Edgegap V2 API
+security:
+  - Api Token: []
