@@ -1,4 +1,4 @@
-name: Manual Trigger Workflow
+name: Import API spec
 
 on:
   workflow_dispatch: {}
