@@ -1,10 +1,46 @@
 name: Import API spec
 
-on:
-  workflow_dispatch: {}
+n:
+  workflow_dispatch:
+    inputs:
+      target_branch:
+        description: 'Branch to update'
+        required: true
 
 jobs:
-  say-hello:
+  create-files:
+    runs-on: ubuntu-latest
+    outputs:
+      filename: ${{ steps.makefile.outputs.filename }}
+    steps:
+      - id: makefile
+        run: |
+          echo "my-data" > output.txt
+          echo "filename=output.txt" >> $GITHUB_OUTPUT
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: output-file
+          path: output.txt
+
+  update-branch:
+    needs: create-files
     runs-on: ubuntu-latest
     steps:
-      - run: echo "Hello from ${{ github.event.inputs.environment }}"
+      - name: Checkout target branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.target_branch }}
+
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: output-file
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add output.txt
+          git commit -m "Update branch with generated file" || echo "No changes"
+          git push origin HEAD:${{ github.event.inputs.target_branch }}
