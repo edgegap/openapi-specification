@@ -2,10 +2,6 @@ name: Import API spec
 
 on:
   workflow_dispatch:
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/main
 
 jobs:
   create-files:
@@ -91,11 +87,6 @@ jobs:
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-<<<<<<< HEAD
           git add edgegap-v2-openapi.yaml
           git commit -m "Update current branch with updated OpenAPI spec" || echo "No changes"
-=======
-          git add output.txt
-          git commit -m "Update current branch with generated file" || echo "No changes"
->>>>>>> origin/main
           git push origin HEAD:${{ github.ref_name }}
