@@ -41,7 +41,7 @@ jobs:
               "oasVersion": "3.1",
               "exportFormat": "YAML"
             }' \
-            -w '%{{http_code}}' -o "$response_file" > "$status_file"
+            -w '%{http_code}' -o "$response_file" > "$status_file"
           status=$(cat "$status_file")
           if [ "$status" != "200" ]; then
             echo "❌ API call failed with status $status"
