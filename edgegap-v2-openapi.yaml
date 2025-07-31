@@ -1,0 +1,217 @@
+openapi: 3.1.0
+info:
+  title: Edgegap V2
+  description: ''
+  version: 1.0.0
+tags:
+  - name: Deployments
+paths:
+  /deployments:
+    post:
+      summary: '[v2] Create a Deployment'
+      deprecated: false
+      description: >-
+        <strong>[Rate Limit: 40/seconds]</strong> Initiate a new deployment. A
+        deployment is a containerized server instance of an application version
+        running on the Edgegap platform.
+      operationId: deployment-create
+      tags:
+        - Deployments
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeploymentCreate'
+        required: true
+      responses:
+        '202':
+          description: Deployment has been created and the deployment process has started
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeploymentResponse'
+          headers: {}
+        '400':
+          description: >-
+            Invalid Application or Application Version. No deployment has been
+            created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          headers: {}
+        '401':
+          description: Unauthorized. No deployment has been created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          headers: {}
+        '422':
+          description: >-
+            Could not allocate an Edge Server for the deployment. A deployment
+            has been created. Deployment is in error state. You can delete it
+            manually or it will be deleted automatically by our system after
+            some some times
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeploymentError422'
+          headers: {}
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          headers: {}
+      security: []
+webhooks: {}
+components:
+  schemas:
+    DeploymentCreate:
+      required:
+        - application
+        - users
+        - version
+      properties:
+        application:
+          type: string
+          description: Name of the application that will be deployed
+          examples:
+            - my-app
+        version:
+          type: string
+          description: Name of the version within the application that will be deployed
+          examples:
+            - '1.0'
+        users:
+          type: array
+          description: >-
+            List of users. These users will be used to select the locations for
+            the deployment
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/User'
+          examples:
+            - - user_type: ip_address
+                user_data:
+                  ip_address: 75.28.35.192
+              - user_type: geo_coordinates
+                user_data:
+                  latitude: 45.508888
+                  longitude: -73.561668
+        environment_variables:
+          type: array
+          description: List of environment variables to inject into the deployment
+          items:
+            $ref: '#/components/schemas/DeploymentEnvironmentVariable'
+        tags:
+          type: array
+          description: List of tags to associate with the deployment
+          items:
+            type: string
+        webhook_on_ready:
+          description: Webhook to call when the deployment is ready
+          allOf:
+            - $ref: '#/components/schemas/BasicWebhook'
+        webhook_on_error:
+          description: Webhook to call when the deployment is in error
+          allOf:
+            - $ref: '#/components/schemas/BasicWebhook'
+        webhook_on_terminated:
+          description: Webhook to call when the deployment is terminated
+          allOf:
+            - $ref: '#/components/schemas/BasicWebhook'
+      type: object
+    User:
+      required:
+        - user_data
+        - user_type
+      properties:
+        user_type:
+          type: string
+          description: Type of user (e.g., ip_address or geo_coordinates)
+        user_data:
+          type: object
+          description: Dynamic user data depending on user_type
+          examples:
+            - ip_address: 75.28.35.192
+          properties: {}
+      type: object
+    DeploymentEnvironmentVariable:
+      required:
+        - is_hidden
+        - key
+        - value
+      properties:
+        key:
+          type: string
+          description: Environment variable key
+          examples:
+            - MY_ENVIRONMENT_VARIABLE
+        value:
+          type: string
+          description: Environment variable value
+          examples:
+            - my-value
+        is_hidden:
+          type: boolean
+          description: An hidden environment variable is not shown in the UI
+          examples:
+            - false
+      type: object
+    BasicWebhook:
+      required:
+        - url
+      properties:
+        url:
+          type: string
+          description: Webhook URL
+          examples:
+            - https://my-webhook.com
+      type: object
+    Error:
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          description: Error message
+          examples:
+            - Error message
+        details:
+          type: object
+          description: Additional error details
+          properties: {}
+      type: object
+    DeploymentError422:
+      required:
+        - message
+        - request_id
+      properties:
+        request_id:
+          type: string
+          description: Request ID. Unique identifier of the deployment request
+          examples:
+            - a69f8e3e0555
+        message:
+          type: string
+          description: Error message
+          examples:
+            - Error message
+      type: object
+    DeploymentResponse:
+      required:
+        - request_id
+      properties:
+        request_id:
+          type: string
+          description: Request ID. Unique identifier of the deployment request
+          examples:
+            - a69f8e3e0555
+      type: object
+  securitySchemes: {}
+servers: []
+security: []
