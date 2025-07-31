@@ -2,10 +2,7 @@ name: Import API spec
 
 on:
   workflow_dispatch:
-    inputs:
-      target_branch:
-        description: 'Branch to update'
-        required: true
+
 
 jobs:
   create-files:
@@ -13,34 +10,84 @@ jobs:
     outputs:
       filename: ${{ steps.makefile.outputs.filename }}
     steps:
-      - id: makefile
+      - name: Validate secrets
+        env:
+          APIDOG_API_KEY: ${{ secrets.APIDOG_API_KEY }}
+          EDGEGAP_V2_PROJECT_ID: ${{ secrets.EDGEGAP_V2_PROJECT_ID }}
         run: |
-          echo "my-data" > output.txt
-          echo "filename=output.txt" >> $GITHUB_OUTPUT
+          if [ -z "$APIDOG_API_KEY" ] || [ -z "$EDGEGAP_V2_PROJECT_ID" ]; then
+            echo "❌ APIDOG_API_KEY and EDGEGAP_V2_PROJECT_ID must be set as secrets."
+            exit 1
+          fi
+
+      - id: export-openapi
+        env:
+          APIDOG_API_KEY: ${{ secrets.APIDOG_API_KEY }}
+          EDGEGAP_V2_PROJECT_ID: ${{ secrets.EDGEGAP_V2_PROJECT_ID }}
+        run: |
+          set -e
+          response_file="edgegap-v2-openapi.yaml"
+          status_file="curl_status.txt"
+          curl --location -g --request POST "https://api.apidog.com/v1/projects/${EDGEGAP_V2_PROJECT_ID}/export-openapi?locale=en-US" \
+            --header "X-Apidog-Api-Version: 2024-03-28" \
+            --header "Authorization: Bearer ${APIDOG_API_KEY}" \
+            --header "Content-Type: application/json" \
+            --data-raw '{
+              "scope": {
+                "type": "ALL"
+              },
+              "options": {
+                "includeApidogExtensionProperties": false
+              },
+              "oasVersion": "3.1",
+              "exportFormat": "YAML"
+            }' \
+            -w '%{{http_code}}' -o "$response_file" > "$status_file"
+          status=$(cat "$status_file")
+          if [ "$status" != "200" ]; then
+            echo "❌ API call failed with status $status"
+            cat "$response_file"
+            exit 1
+          fi
+          if jq -e '.success == false' "$response_file" >/dev/null 2>&1; then
+            echo "❌ API call returned success: false"
+            cat "$response_file"
+            exit 1
+          fi
+          echo "filename=$response_file" >> $GITHUB_OUTPUT
 
       - uses: actions/upload-artifact@v4
         with:
           name: output-file
-          path: output.txt
+          path: edgegap-v2-openapi.yaml
 
   update-branch:
     needs: create-files
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout target branch
+      - name: Verify branch context
+        run: |
+          echo "Triggered from ref: ${{ github.ref }}"
+          echo "Branch name: ${{ github.ref_name }}"
+          if [[ "${{ github.ref_type }}" != "branch" ]]; then
+            echo "❌ This workflow must be triggered on a branch."
+            exit 1
+          fi
+
+      - name: Checkout current branch
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.inputs.target_branch }}
+          ref: ${{ github.ref_name }}
 
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
           name: output-file
 
-      - name: Commit changes
+      - name: Commit and push changes
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git add output.txt
-          git commit -m "Update branch with generated file" || echo "No changes"
-          git push origin HEAD:${{ github.event.inputs.target_branch }}
+          git add edgegap-v2-openapi.yaml
+          git commit -m "Update current branch with updated OpenAPI spec" || echo "No changes"
+          git push origin HEAD:${{ github.ref_name }}
