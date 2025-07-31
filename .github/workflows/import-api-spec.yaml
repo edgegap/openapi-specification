@@ -1,6 +1,6 @@
 name: Import API spec
 
-n:
+on:
   workflow_dispatch:
     inputs:
       target_branch:
