@@ -155,13 +155,13 @@ paths:
                           example: alpha-north-america-95fab093
                         status:
                           type: string
-                          enum:
-                            - PENDING
-                            - ACTIVE
                           description: >-
                             Lifecycle stage of the host, only ACTIVE hosts
                             accept deployments.
-                          example: PENDING
+                          enum:
+                            - PENDING
+                            - ACTIVE
+                          example: ACTIVE
                         ip_address:
                           type: string
                           description: Public IP address of the host.
