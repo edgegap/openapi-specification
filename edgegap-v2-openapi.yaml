@@ -532,6 +532,7 @@ components:
           type: array
           items:
             type: string
+            example: alpha-north-america-95fab093
           description: >-
             Preferred and prioritized Private Host IDs to try before overflowing
             to cloud.
@@ -563,6 +564,7 @@ components:
           description: List of tags to associate with the deployment
           items:
             type: string
+            example: my-custom-tag
         webhook_on_ready:
           description: Webhook to call when the deployment is ready
           allOf:
@@ -625,6 +627,7 @@ components:
           description: List of tags to associate with the deployment
           items:
             type: string
+            example: my-custom-tag
         webhook_on_ready:
           description: Webhook to call when the deployment is ready
           allOf:
