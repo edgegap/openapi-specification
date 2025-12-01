@@ -252,7 +252,7 @@ paths:
                           type: string
                           description: Timestamp of last update in UTC, ISO 8601 format.
                           example: '2025-11-26T16:32:30.825144Z'
-                        pin:
+                        centroid:
                           type: object
                           properties:
                             label:
@@ -275,26 +275,6 @@ paths:
                                 Approximate geographic radius used to pick
                                 primary and fallback locations.
                               example: 700
-                            radius_strategy:
-                              type: integer
-                            cpu_cores:
-                              type: integer
-                              description: >-
-                                Host specification vCPU selected during fleet
-                                creation.
-                              example: 16
-                            memory_gb:
-                              type: integer
-                              description: >-
-                                Host specification memory selected during fleet
-                                creation.
-                              example: 32
-                            clock_speed_ghz:
-                              type: number
-                              description: >-
-                                Host specification base CPU clock frequency
-                                selected during fleet creation.
-                              example: 2
                             desired_host_count:
                               type: integer
                               description: >-
@@ -306,33 +286,53 @@ paths:
                             - latitude
                             - longitude
                             - radius_km
-                            - radius_strategy
-                            - cpu_cores
-                            - memory_gb
-                            - clock_speed_ghz
                             - desired_host_count
                           description: >-
                             Centroid information used to orchestrate placement
                             of the host.
-                        delete_schedules:
-                          type: array
-                          items:
-                            type: object
-                            properties:
-                              uuid:
-                                type: string
-                                description: Unique identifier of deletion schedule.
-                                example: 6458350c-52ca-453b-bb1b-e2f7c9b4f4e9
-                              scheduled_at:
-                                type: string
-                                description: >-
-                                  Timestamp of scheduled deletion in UTC, ISO
-                                  8601 format.
-                                example: '2025-11-30T23:59:00Z'
-                            required:
-                              - uuid
-                              - scheduled_at
+                        delete_schedule:
+                          type: object
+                          properties:
+                            uuid:
+                              type: string
+                              description: Unique identifier of deletion schedule.
+                              example: 10287c9b-a6e2-4909-84c8-59daf74895b5
+                            scheduled_at:
+                              type: string
+                              description: >-
+                                Timestamp of scheduled deletion in UTC, ISO 8601
+                                format.
+                              example: '2025-11-30T23:59:00Z'
                           description: If defined, specified when the host will be deleted.
+                          required:
+                            - uuid
+                            - scheduled_at
+                          nullable: true
+                        fleet_host_specifications:
+                          type: object
+                          properties:
+                            cpu_units:
+                              type: integer
+                              description: >-
+                                Host specification vCPU units selected during
+                                fleet creation.
+                              example: 16384
+                            memory_mb:
+                              type: integer
+                              description: >-
+                                Host specification memory MB selected during
+                                fleet creation.
+                              example: 32768
+                            base_clock_speed_mhz:
+                              type: integer
+                              description: >-
+                                Host specification base CPU clock frequency
+                                selected during fleet creation.
+                              example: 2000
+                          required:
+                            - cpu_units
+                            - memory_mb
+                            - base_clock_speed_mhz
                       description: List of private fleet hosts.
                       required:
                         - host_id
@@ -341,8 +341,8 @@ paths:
                         - allocated_memory_mb
                         - created_at
                         - updated_at
-                        - pin
-                        - delete_schedules
+                        - centroid
+                        - fleet_host_specifications
                 required:
                   - data
           headers: {}
