@@ -2,7 +2,7 @@ openapi: 3.0.1
 info:
   title: Edgegap v2 API
   description: 'Maintained by [Edgegap Technologies](https://edgegap.com/)'
-  version: 1.0.0
+  version: 2026.02.20
 tags: []
 paths:
   /deployments:
@@ -405,7 +405,7 @@ paths:
           headers: {}
       security:
         - api-token: []
-  /private-fleets:deploy:
+  /private-fleets/deployments:
     post:
       summary: Deploy to Fleet
       deprecated: false
@@ -684,6 +684,7 @@ components:
           description: Webhook URL
           example: https://my-webhook.com
       type: object
+  responses: {}
   securitySchemes:
     api-token:
       type: apiKey
