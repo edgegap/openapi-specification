@@ -2,7 +2,7 @@ openapi: 3.0.1
 info:
   title: Edgegap v2 API
   description: 'Maintained by [Edgegap Technologies](https://edgegap.com/)'
-  version: 2026.02.20
+  version: 2026.03.16
 tags: []
 paths:
   /deployments:
@@ -270,11 +270,10 @@ paths:
                                 centroid.
                               example: -78.67419552556069
                             radius_km:
-                              type: integer
+                              type: number
                               description: >-
                                 Approximate geographic radius used to pick
                                 primary and fallback locations.
-                              example: 700
                             desired_host_count:
                               type: integer
                               description: >-
