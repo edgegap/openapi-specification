@@ -858,7 +858,7 @@ paths:
       summary: Update App Version
       deprecated: false
       description: Modify existing app version.
-      operationId: app-versions-update
+      operationId: app-version-update
       tags:
         - Applications
         - Versioning
@@ -1393,7 +1393,7 @@ paths:
         - apiKey: []
   /v1/container-registry/images/{image_name}/tags/{tag_name}:
     delete:
-      summary: Delete Tag
+      summary: Delete Image Tag
       deprecated: false
       description: Delete a single tag and the associated image in the registry.
       operationId: registry-image-tag-delete
@@ -1935,269 +1935,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-          headers: {}
-      security:
-        - apiKey: []
-  /v1/deploy:
-    post:
-      summary: Deploy Server
-      deprecated: false
-      description: >-
-        [Rate Limit: 40 req/s] Create a new deployment - containerized instance
-        of an application version.
-      operationId: deployment-create
-      tags:
-        - Deployments
-        - Dedicated Servers
-      parameters:
-        - name: Accept
-          in: header
-          description: ''
-          example: '*/*'
-          schema:
-            type: string
-        - name: Content-Type
-          in: header
-          description: ''
-          example: application/json
-          schema:
-            type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                app_name:
-                  type: string
-                  description: Application to deploy.
-                  example: my-game-server
-                version_name:
-                  type: string
-                  description: >-
-                    Version to deploy. If omitted, last created version will be
-                    deployed.
-                  example: 2024.01.30-16.23.00-UTC
-                ip_list:
-                  type: array
-                  items:
-                    type: string
-                    example: 162.254.141.66
-                  description: >-
-                    Mutually exclusive with geo_ip_list. List of user IPs,
-                    determining server location choice.
-                geo_ip_list:
-                  type: array
-                  description: >-
-                    Mutually exclusive with ip_list. List of user IPs and
-                    coordinates, determining server location choice. Coordinates
-                    override IP address.
-                  items:
-                    type: object
-                    properties:
-                      ip:
-                        type: string
-                        description: User public IP address.
-                        example: 162.254.141.66
-                      latitude:
-                        type: number
-                        description: User latitude.
-                        example: 41.0818
-                      longitude:
-                        type: number
-                        description: User longitude.
-                        example: -73.8896
-                    required:
-                      - ip
-                      - latitude
-                      - longitude
-                filters:
-                  type: array
-                  description: Restricts possible locations for the deployment.
-                  items:
-                    type: object
-                    properties:
-                      field:
-                        type: string
-                        description: Deployment field used for filtering.
-                        example: city
-                      values:
-                        type: array
-                        description: Values to compare against.
-                        items:
-                          type: string
-                          example: Montreal
-                        example:
-                          - Montreal
-                      filter_type:
-                        type: string
-                        description: Filter operator.
-                        enum:
-                          - any
-                          - all
-                          - not
-                        example: any
-                    required:
-                      - field
-                      - filter_type
-                      - values
-                env_vars:
-                  type: array
-                  description: >-
-                    List of environment variables to set in your deployment
-                    instance. These variables will be available in your
-                    container.
-                  items:
-                    $ref: '#/components/schemas/InjectedEnvVariable'
-                tags:
-                  type: array
-                  description: List of tags to mark your deployments for easy filtering.
-                  items:
-                    type: string
-                    example: production
-                webhook_url:
-                  type: string
-                  description: >-
-                    URL to receive simple HTTP notifications in your game
-                    backend when the new deployment becomes Ready.
-                  example: https://www.webhook.com/
-                container_log_storage:
-                  type: object
-                  properties:
-                    enabled:
-                      type: boolean
-                      description: Enable or disable uploading logs.
-                    endpoint_storage:
-                      type: string
-                      description: Endpoint storage identifier to upload deployment logs.
-                      example: my-endpoint
-                  required:
-                    - enabled
-                    - endpoint_storage
-                  description: Endpoint storage to upload deployment logs.
-                command:
-                  description: >-
-                    Overrides container command for the deployment, use with
-                    caution.
-                  type: string
-                  nullable: true
-                  example: null | 'string'
-                arguments:
-                  description: >-
-                    Overrides container arguments for the deployment, use with
-                    caution.
-                  type: string
-                  nullable: true
-                  example: null | 'string'
-              required:
-                - app_name
-            example:
-              app_name: my-game-server
-              version_name: production
-              ip_list:
-                - 162.254.141.66
-        required: true
-      responses:
-        '200':
-          description: Success
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  request_id:
-                    type: string
-                    description: ID of your deployment, also referred to as request ID.
-                    example: 61b1be8f54d9
-                  request_dns:
-                    type: string
-                    description: FQDN (URL) to connect to the deployment.
-                    example: 61b1be8f54d9.pr.edgegap.net
-                  request_app:
-                    type: string
-                    description: Application which has been deployed.
-                    example: my-game-server
-                  request_version:
-                    type: string
-                    description: App version which has been deployed.
-                    example: 2024.01.30-16.23.00-UTC
-                  request_user_count:
-                    type: integer
-                    description: Number of users included in the deployment request.
-                    minimum: 1
-                    example: 4
-                  filters:
-                    type: array
-                    description: >-
-                      List of filters applied to choose the location of the
-                      deployment.
-                    items:
-                      $ref: '#/components/schemas/V1DeployFilter'
-                  tags:
-                    type: array
-                    description: List of tags to mark your deployments for easy filtering.
-                    items:
-                      type: string
-                      example: production
-                  container_log_storage:
-                    description: Object storage to upload deployment logs.
-                required:
-                  - request_app
-                  - request_dns
-                  - request_id
-                  - request_user_count
-                  - request_version
-                  - filters
-          headers: {}
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-          headers: {}
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-          headers: {}
-        '404':
-          description: ''
-          content:
-            application/json:
-              schema:
-                title: ''
-                type: object
-                properties:
-                  message:
-                    type: string
-                    description: A message depending of the request termination
-                required:
-                  - message
-          headers: {}
-        '409':
-          description: Conflict
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-          headers: {}
-        '422':
-          description: Unprocessable
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-          headers: {}
-        '500':
-          description: ''
-          content:
-            application/json:
-              schema:
-                type: object
-                properties: {}
           headers: {}
       security:
         - apiKey: []
@@ -3133,6 +2870,269 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+          headers: {}
+      security:
+        - apiKey: []
+  /v1/deploy:
+    post:
+      summary: ⚠️ Deploy Server
+      deprecated: true
+      description: >-
+        DEPRECATED. [Rate Limit: 40 req/s] Create a new deployment -
+        containerized instance of an application version.
+      operationId: deployment-create
+      tags:
+        - Deployments
+        - Dedicated Servers
+      parameters:
+        - name: Accept
+          in: header
+          description: ''
+          example: '*/*'
+          schema:
+            type: string
+        - name: Content-Type
+          in: header
+          description: ''
+          example: application/json
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                app_name:
+                  type: string
+                  description: Application to deploy.
+                  example: my-game-server
+                version_name:
+                  type: string
+                  description: >-
+                    Version to deploy. If omitted, last created version will be
+                    deployed.
+                  example: 2024.01.30-16.23.00-UTC
+                ip_list:
+                  type: array
+                  items:
+                    type: string
+                    example: 162.254.141.66
+                  description: >-
+                    Mutually exclusive with geo_ip_list. List of user IPs,
+                    determining server location choice.
+                geo_ip_list:
+                  type: array
+                  description: >-
+                    Mutually exclusive with ip_list. List of user IPs and
+                    coordinates, determining server location choice. Coordinates
+                    override IP address.
+                  items:
+                    type: object
+                    properties:
+                      ip:
+                        type: string
+                        description: User public IP address.
+                        example: 162.254.141.66
+                      latitude:
+                        type: number
+                        description: User latitude.
+                        example: 41.0818
+                      longitude:
+                        type: number
+                        description: User longitude.
+                        example: -73.8896
+                    required:
+                      - ip
+                      - latitude
+                      - longitude
+                filters:
+                  type: array
+                  description: Restricts possible locations for the deployment.
+                  items:
+                    type: object
+                    properties:
+                      field:
+                        type: string
+                        description: Deployment field used for filtering.
+                        example: city
+                      values:
+                        type: array
+                        description: Values to compare against.
+                        items:
+                          type: string
+                          example: Montreal
+                        example:
+                          - Montreal
+                      filter_type:
+                        type: string
+                        description: Filter operator.
+                        enum:
+                          - any
+                          - all
+                          - not
+                        example: any
+                    required:
+                      - field
+                      - filter_type
+                      - values
+                env_vars:
+                  type: array
+                  description: >-
+                    List of environment variables to set in your deployment
+                    instance. These variables will be available in your
+                    container.
+                  items:
+                    $ref: '#/components/schemas/InjectedEnvVariable'
+                tags:
+                  type: array
+                  description: List of tags to mark your deployments for easy filtering.
+                  items:
+                    type: string
+                    example: production
+                webhook_url:
+                  type: string
+                  description: >-
+                    URL to receive simple HTTP notifications in your game
+                    backend when the new deployment becomes Ready.
+                  example: https://www.webhook.com/
+                container_log_storage:
+                  type: object
+                  properties:
+                    enabled:
+                      type: boolean
+                      description: Enable or disable uploading logs.
+                    endpoint_storage:
+                      type: string
+                      description: Endpoint storage identifier to upload deployment logs.
+                      example: my-endpoint
+                  required:
+                    - enabled
+                    - endpoint_storage
+                  description: Endpoint storage to upload deployment logs.
+                command:
+                  description: >-
+                    Overrides container command for the deployment, use with
+                    caution.
+                  type: string
+                  nullable: true
+                  example: null | 'string'
+                arguments:
+                  description: >-
+                    Overrides container arguments for the deployment, use with
+                    caution.
+                  type: string
+                  nullable: true
+                  example: null | 'string'
+              required:
+                - app_name
+            example:
+              app_name: my-game-server
+              version_name: production
+              ip_list:
+                - 162.254.141.66
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  request_id:
+                    type: string
+                    description: ID of your deployment, also referred to as request ID.
+                    example: 61b1be8f54d9
+                  request_dns:
+                    type: string
+                    description: FQDN (URL) to connect to the deployment.
+                    example: 61b1be8f54d9.pr.edgegap.net
+                  request_app:
+                    type: string
+                    description: Application which has been deployed.
+                    example: my-game-server
+                  request_version:
+                    type: string
+                    description: App version which has been deployed.
+                    example: 2024.01.30-16.23.00-UTC
+                  request_user_count:
+                    type: integer
+                    description: Number of users included in the deployment request.
+                    minimum: 1
+                    example: 4
+                  filters:
+                    type: array
+                    description: >-
+                      List of filters applied to choose the location of the
+                      deployment.
+                    items:
+                      $ref: '#/components/schemas/V1DeployFilter'
+                  tags:
+                    type: array
+                    description: List of tags to mark your deployments for easy filtering.
+                    items:
+                      type: string
+                      example: production
+                  container_log_storage:
+                    description: Object storage to upload deployment logs.
+                required:
+                  - request_app
+                  - request_dns
+                  - request_id
+                  - request_user_count
+                  - request_version
+                  - filters
+          headers: {}
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          headers: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          headers: {}
+        '404':
+          description: ''
+          content:
+            application/json:
+              schema:
+                title: ''
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: A message depending of the request termination
+                required:
+                  - message
+          headers: {}
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          headers: {}
+        '422':
+          description: Unprocessable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          headers: {}
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
           headers: {}
       security:
         - apiKey: []
