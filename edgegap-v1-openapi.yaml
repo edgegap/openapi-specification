@@ -627,6 +627,18 @@ paths:
                   minimum: -1
                   maximum: 1440
                   example: 1440
+                restart_policy:
+                  type: string
+                  enum:
+                    - always
+                    - never
+                    - on_failure
+                  default: always
+                  description: >-
+                    Define policy for handling server process exit codes. Set to
+                    `never` to automatically stop deployments when your server
+                    process exits.
+                  example: never
                 termination_grace_period_seconds:
                   type: integer
                   description: >-
@@ -683,6 +695,7 @@ paths:
                   protocol: UDP
                   to_check: false
                   name: gameport
+              restart_policy: never
         required: true
       responses:
         '200':
@@ -697,7 +710,7 @@ paths:
                     description: If the creation happened correctly
                     default: true
                   version:
-                    $ref: '#/components/schemas/AppVersionPayload'
+                    $ref: '#/components/schemas/AppVersion'
                 required:
                   - success
                   - version
@@ -815,7 +828,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppVersionPayload'
+                $ref: '#/components/schemas/AppVersion'
           headers: {}
         '400':
           description: ''
@@ -962,6 +975,18 @@ paths:
                   minimum: -1
                   maximum: 1440
                   example: 1440
+                restart_policy:
+                  type: string
+                  description: >-
+                    Define policy for handling server process exit codes. Set to
+                    `never` to automatically stop deployments when your server
+                    process exits.
+                  enum:
+                    - always
+                    - never
+                    - on_failure
+                  default: always
+                  example: never
                 termination_grace_period_seconds:
                   type: integer
                   description: >-
@@ -1016,7 +1041,7 @@ paths:
                   success:
                     type: boolean
                   version:
-                    $ref: '#/components/schemas/AppVersionPayload'
+                    $ref: '#/components/schemas/AppVersion'
                 required:
                   - success
           headers: {}
@@ -1170,7 +1195,7 @@ paths:
                   versions:
                     type: array
                     items:
-                      $ref: '#/components/schemas/AppVersionPayload'
+                      $ref: '#/components/schemas/AppVersion'
                   total_count:
                     type: integer
                     minimum: 0
@@ -5575,7 +5600,7 @@ components:
           description: Additional information regarding deployment termination.
           example: 1a9e4ff02cce - Delete request will be processed soon
       type: object
-    AppVersionPayload:
+    AppVersion:
       required:
         - docker_image
         - docker_repository
@@ -5680,6 +5705,17 @@ components:
           minimum: -1
           maximum: 1440
           example: 1440
+        restart_policy:
+          type: string
+          description: >-
+            Define policy for handling server process exit codes. Set to `never`
+            to automatically stop deployments when your server process exits.
+          enum:
+            - always
+            - never
+            - on_failure
+          default: always
+          example: never
         termination_grace_period_seconds:
           type: integer
           description: >-
