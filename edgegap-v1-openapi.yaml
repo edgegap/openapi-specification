@@ -1272,6 +1272,162 @@ paths:
           headers: {}
       security:
         - apiKey: []
+  /v1/container-registry/images/{image_name}/tags/bulk-delete:
+    post:
+      summary: Delete Image Tags
+      deprecated: false
+      description: >-
+        Delete multiple tags of a registry image. Returns 207 Multi-Status with
+        result for each tag separately. Caution is advised.
+      operationId: registry-image-tag-bulk-delete
+      tags:
+        - Container Registry
+        - Versioning
+      parameters:
+        - name: image_name
+          in: path
+          description: The name of the image
+          required: true
+          example: my-org-cv2l3w3vy6fg/my-game-server
+          schema:
+            type: string
+        - name: Accept
+          in: header
+          description: ''
+          example: '*/*'
+          schema:
+            type: string
+        - name: Content-Type
+          in: header
+          description: ''
+          example: application/json
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tags:
+                  type: array
+                  items:
+                    type: string
+                    example: 1.0.0
+                  description: Tags to delete.
+              required:
+                - tags
+            examples: {}
+        required: true
+      responses:
+        '207':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        tag:
+                          type: string
+                          description: Tag from your request.
+                          example: 1.0.0
+                        status:
+                          type: integer
+                          enum:
+                            - 204
+                            - 404
+                            - 500
+                          description: HTTP status code indicating operation result.
+                          example: 204
+                        message:
+                          type: string
+                          description: Additional details.
+                    description: Each tag receives a separate result.
+                  summary:
+                    type: object
+                    properties:
+                      total:
+                        type: integer
+                        minimum: 1
+                        description: Total amount of processed tags.
+                        example: 2
+                      success:
+                        type: integer
+                        minimum: 0
+                        description: Amount of successfully deleted tags.
+                        example: 1
+                      failed:
+                        type: integer
+                        minimum: 0
+                        description: Amount of tags which could not be deleted.
+                        example: 1
+                    required:
+                      - total
+                      - success
+                      - failed
+                required:
+                  - results
+                  - summary
+          headers: {}
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                title: ''
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: A message depending of the request termination
+                required:
+                  - message
+        '401':
+          description: ''
+          content:
+            application/json:
+              schema:
+                title: ''
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: A message depending of the request termination
+                required:
+                  - message
+        '404':
+          description: ''
+          content:
+            application/json:
+              schema:
+                title: ''
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: A message depending of the request termination
+                required:
+                  - message
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                title: ''
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: A message depending of the request termination
+                required:
+                  - message
+      security:
+        - apiKey: []
   /v1/container-registry/images/{image_name}/tags:
     get:
       summary: List Image Tags
