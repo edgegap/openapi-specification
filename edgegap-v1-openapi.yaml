@@ -8,7 +8,7 @@ info:
     target="_blank">the official documentation.</a> If you have any questions or
     feature suggestions, <a href="http://discord.gg/NgCnkHbsGp"
     target="_blank">contact us on Discord</a>.</p>
-  version: 2026.04.24
+  version: 2026.06.17
   termsOfService: https://app.edgegap.com/terms-and-conditions
   contact:
     name: Contact
@@ -919,6 +919,20 @@ paths:
                   description: Enable or disable deployments.
                   default: true
                   example: true
+                req_cpu:
+                  type: integer
+                  minimum: 100
+                  description: >-
+                    Amount of vCPU units assigned to deployments. (1024 units =
+                    1 vCPU).
+                  example: 1536
+                req_memory:
+                  type: integer
+                  description: >-
+                    Amount of memory MB assigned to deployments, at most double
+                    your vCPU units. (1024 MB = 1 GB).
+                  minimum: 100
+                  example: 3072
                 docker_repository:
                   type: string
                   description: >-
@@ -2732,6 +2746,20 @@ paths:
           example: 61b1be8f54d9
           schema:
             type: string
+        - name: format
+          in: query
+          description: >-
+            Requested output format. `text` returns plain-text lines, `ndjson`
+            returns newline-delimited JSON carrying timestamped lines.
+          required: false
+          example: ndjson
+          schema:
+            type: string
+            default: text
+            enum:
+              - text
+              - ndjson
+            example: ndjson
         - name: Accept
           in: header
           description: ''
@@ -4998,6 +5026,16 @@ paths:
                   type: string
                   description: Name of the Endpoint Storage
                   example: my-s3-bucket
+                container_log_version:
+                  type: string
+                  default: v1
+                  enum:
+                    - v1
+                    - v2
+                  description: >-
+                    v1 (default, legacy) stores 1 file per deployment. v2
+                    (enhanced) streams chunks of logs in real time.
+                  example: v2
                 access_key_id:
                   type: string
                   description: Your access key ID to connect to your S3 Bucket.
@@ -5048,6 +5086,16 @@ paths:
                     type: string
                     description: Name of the Endpoint Storage
                     example: my-s3-bucket
+                  container_log_version:
+                    type: string
+                    description: >-
+                      v1 (default, legacy) stores 1 file per deployment. v2
+                      (enhanced) streams chunks of logs in real time.
+                    enum:
+                      - v1
+                      - v2
+                    default: v1
+                    example: v2
                   access_key_id:
                     type: string
                     description: Your access key ID to connect to your S3 Bucket.
@@ -5216,6 +5264,16 @@ paths:
                   type: string
                   description: Name of the Endpoint Storage
                   example: my-s3-endpoint
+                container_log_version:
+                  type: string
+                  default: v1
+                  enum:
+                    - v1
+                    - v2
+                  description: >-
+                    v1 (default, legacy) stores 1 file per deployment. v2
+                    (enhanced) streams chunks of logs in real time.
+                  example: v2
                 access_key_id:
                   type: string
                   description: Your access key ID to connect to your S3 Bucket.
@@ -5260,6 +5318,16 @@ paths:
                     type: string
                     description: Name of the Endpoint Storage
                     example: my-s3-endpoint
+                  container_log_version:
+                    type: string
+                    enum:
+                      - v1
+                      - v2
+                    default: v1
+                    description: >-
+                      v1 (default, legacy) stores 1 file per deployment. v2
+                      (enhanced) streams chunks of logs in real time.
+                    example: v2
                   access_key_id:
                     type: string
                     description: Your access key ID to connect to your S3 Bucket.
@@ -5997,6 +6065,16 @@ components:
           type: string
           description: Name of the Endpoint Storage
           example: my-s3-endpoint
+        container_log_version:
+          type: string
+          default: v1
+          enum:
+            - v1
+            - v2
+          description: >-
+            v1 (default, legacy) stores 1 file per deployment. v2 (enhanced)
+            streams chunks of logs in real time.
+          example: v2
         access_key_id:
           type: string
           description: Your access key ID to connect to your S3 Bucket.
@@ -6215,6 +6293,6 @@ components:
         dashboard.](https://app.edgegap.com/user-settings?tab=tokens)
 servers:
   - url: https://api.edgegap.com
-    description: https://api.edgegap.com
+    description: v1
 security:
   - apiKey: []
