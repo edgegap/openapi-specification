@@ -8,7 +8,7 @@ info:
     target="_blank">the official documentation.</a> If you have any questions or
     feature suggestions, <a href="http://discord.gg/NgCnkHbsGp"
     target="_blank">contact us on Discord</a>.</p>
-  version: 20026.06.01
+  version: 2026.08.05
   contact:
     name: Contact
     email: info@edgegap.com
@@ -40,6 +40,7 @@ paths:
         - name: Content-Type
           in: header
           description: ''
+          required: true
           example: application/json
           schema:
             type: string
@@ -178,6 +179,7 @@ paths:
         - name: Content-Type
           in: header
           description: ''
+          required: true
           example: application/json
           schema:
             type: string
@@ -518,6 +520,7 @@ paths:
         - name: Content-Type
           in: header
           description: ''
+          required: true
           example: application/json
           schema:
             type: string
@@ -555,14 +558,14 @@ paths:
                       description: >-
                         Amount of vCPU units assigned to deployment. (1024 units
                         = 1 vCPU).
-                      minimum: 100
+                      minimum: 256
                       example: 1536
                     memory_mib:
                       type: integer
                       description: >-
                         Amount of memory MB assigned to deployment, at most
                         double your vCPU units. (1024 MB = 1 GB).
-                      minimum: 100
+                      minimum: 256
                       example: 3072
                   required:
                     - cpu_units
@@ -810,14 +813,14 @@ components:
               description: >-
                 Amount of vCPU units assigned to deployment. (1024 units = 1
                 vCPU).
-              minimum: 100
+              minimum: 256
               example: 1536
             memory_mib:
               type: integer
               description: >-
                 Amount of memory MB assigned to deployment, at most double your
                 vCPU units. (1024 MB = 1 GB).
-              minimum: 100
+              minimum: 256
               example: 3072
           required:
             - cpu_units
@@ -918,6 +921,6 @@ components:
         dashboard.](https://app.edgegap.com/user-settings?tab=tokens)
 servers:
   - url: https://api.edgegap.com/v2
-    description: v1
+    description: v2
 security:
   - apiKey1: []
