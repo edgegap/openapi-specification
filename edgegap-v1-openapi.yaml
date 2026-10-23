@@ -8,7 +8,7 @@ info:
     target="_blank">the official documentation.</a> If you have any questions or
     feature suggestions, <a href="http://discord.gg/NgCnkHbsGp"
     target="_blank">contact us on Discord</a>.</p>
-  version: 2026.08.05
+  version: 2026.10.23
   termsOfService: https://app.edgegap.com/terms-and-conditions
   contact:
     name: Contact
@@ -1031,10 +1031,14 @@ paths:
                   type: array
                   items:
                     $ref: '#/components/schemas/AppVersionPort'
-                  description: Port mapping exposing server listeners to internet.
+                  description: >-
+                    Port mapping exposing server listeners to internet. Updating
+                    replaces all current values.
                 envs:
                   type: array
-                  description: Inject variables to pass parameters to your game server.
+                  description: >-
+                    Inject variables to pass parameters to your game server.
+                    Updating replaces all current values.
                   items:
                     $ref: '#/components/schemas/InjectedEnvVariable'
                 endpoint_storage:
