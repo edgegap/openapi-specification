@@ -18,12 +18,14 @@ jobs:
           - edgegap-v1-openapi.yaml
           - edgegap-v2-openapi.yaml
 
-    # Run Swagger Editor locally so specs are not sent to editor.swagger.io
+    # Run Swagger Editor locally so specs are not sent to editor.swagger.io.
+    # Pinned so a new upstream release can't silently break CI.
+    # Swagger Editor 5 images serve on port 80 (not 8080 as in the action's README).
     services:
       swagger-editor:
-        image: swaggerapi/swagger-editor
+        image: swaggerapi/swagger-editor:v5.11.3
         ports:
-          - 80:8080
+          - 80:80
 
     steps:
       - uses: actions/checkout@v4
