@@ -242,7 +242,7 @@ paths:
                           nullable: true
                           example: North America
                         allocated_cpu_units:
-                          type: integer
+                          type: intger
                           description: >-
                             Total virtual CPU units currently in use for
                             deployments, beacons, and orchestration.

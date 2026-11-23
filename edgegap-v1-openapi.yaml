@@ -672,7 +672,7 @@ paths:
                   type: array
                   description: Inject variables to pass parameters to your game server.
                   items:
-                    $ref: '#/components/schemas/InjectedEnvVariable'
+                    $ref: '#/components/schemas/DoesNotExist'
                 endpoint_storage:
                   type: string
                   description: >-
