@@ -391,13 +391,8 @@ paths:
                         - updated_at
                         - centroid
                         - fleet_host_specifications
-                  total_count:
-                    type: integer
-                    minimum: 0
-                    example: 100
                 required:
                   - data
-                  - total_count
           headers: {}
         '400':
           description: ''
@@ -586,7 +581,6 @@ paths:
                         description: A secret environment variable is not shown in the UI
                         example: false
                     required:
-                      - is_secret
                       - key
                       - value
                 tags:
@@ -839,7 +833,6 @@ components:
                 description: A secret environment variable is not shown in the UI
                 example: false
             required:
-              - is_secret
               - key
               - value
         tags:
