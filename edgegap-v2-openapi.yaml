@@ -391,52 +391,8 @@ paths:
                         - updated_at
                         - centroid
                         - fleet_host_specifications
-                  total_count:
-                    type: integer
-                    minimum: 0
-                    example: 100
-                  pagination:
-                    type: object
-                    properties:
-                      number:
-                        type: integer
-                        minimum: 1
-                        example: 1
-                      next_page_number:
-                        type: integer
-                        minimum: 1
-                        nullable: true
-                        example: 2
-                      previous_page_number:
-                        type: integer
-                        minimum: 1
-                        nullable: true
-                      paginator:
-                        type: object
-                        properties:
-                          num_pages:
-                            type: integer
-                            minimum: 1
-                            example: 10
-                        required:
-                          - num_pages
-                      has_next:
-                        type: boolean
-                        default: true
-                      has_previous:
-                        type: boolean
-                        default: false
-                    required:
-                      - number
-                      - next_page_number
-                      - previous_page_number
-                      - paginator
-                      - has_next
-                      - has_previous
                 required:
                   - data
-                  - total_count
-                  - pagination
           headers: {}
         '400':
           description: ''
@@ -537,8 +493,7 @@ paths:
                     example: alpha-north-america-95fab093
                   description: >-
                     Preferred and prioritized Private Host IDs to try before
-                    overflowing to cloud.
-                  minItems: 1
+                    overflowing to cloud. Required, but may be an empty array.
                   uniqueItems: true
                 application:
                   type: string
@@ -621,12 +576,11 @@ paths:
                         type: string
                         description: Environment variable value
                         example: my-value
-                      is_hidden:
+                      is_secret:
                         type: boolean
-                        description: An hidden environment variable is not shown in the UI
+                        description: A secret environment variable is not shown in the UI
                         example: false
                     required:
-                      - is_hidden
                       - key
                       - value
                 tags:
@@ -874,12 +828,11 @@ components:
                 type: string
                 description: Environment variable value
                 example: my-value
-              is_hidden:
+              is_secret:
                 type: boolean
-                description: An hidden environment variable is not shown in the UI
+                description: A secret environment variable is not shown in the UI
                 example: false
             required:
-              - is_hidden
               - key
               - value
         tags:

@@ -5647,7 +5647,7 @@ components:
           type: string
           description: Custom value to inject in your deployment, up to 4 KB.
           example: advanced-example
-        is_hidden:
+        is_secret:
           type: boolean
           description: Enable encryption at rest to prevent reading the value with API.
           default: false
