@@ -17,7 +17,7 @@ formatting (2-space indentation, `>-` folded descriptions, field order).
    and returns. Don't document fields, constraints or pagination the API doesn't
    have. If you're unsure how the API behaves, ask before changing the spec.
 3. **Keep v1 and v2 consistent** for concepts they share. For example,
-   environment variables use `is_secret` (not the old `is_hidden`) in both.
+   environment variables use `is_hidden` (not `is_secret`) in both.
 4. **Check the whole file** for other copies of what you're changing. The same
    schema is often defined inline in a path and again under
    `components/schemas`.
