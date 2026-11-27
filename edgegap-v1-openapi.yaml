@@ -8,7 +8,7 @@ info:
     target="_blank">the official documentation.</a> If you have any questions or
     feature suggestions, <a href="http://discord.gg/NgCnkHbsGp"
     target="_blank">contact us on Discord</a>.</p>
-  version: 2026.11.24
+  version: 2026.11.27
   termsOfService: https://app.edgegap.com/terms-and-conditions
   contact:
     name: Contact
@@ -1840,50 +1840,46 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/DeploymentTagResponse'
-                  total_count:
+                  count:
                     type: integer
                     minimum: 0
-                    example: 100
+                    example: 3
                   pagination:
                     type: object
                     properties:
-                      number:
+                      page:
+                        type: integer
+                        minimum: 1
+                        example: 1
+                      num_pages:
+                        type: integer
+                        minimum: 1
+                        example: 1
+                      next_page:
+                        type: integer
+                        minimum: 1
+                        nullable: true
+                      previous_page:
+                        type: integer
+                        minimum: 1
+                        nullable: true
+                      per_page:
+                        type: integer
+                        minimum: 1
+                        example: 20
+                      total_count:
                         type: integer
                         minimum: 0
-                        example: 1
-                      next_page_number:
-                        type: integer
-                        minimum: 1
-                        nullable: true
-                        example: 2
-                      previous_page_number:
-                        type: integer
-                        minimum: 1
-                        nullable: true
-                      paginator:
-                        type: object
-                        properties:
-                          num_pages:
-                            type: integer
-                            minimum: 1
-                            example: 10
-                        required:
-                          - num_pages
-                      has_next:
-                        type: boolean
-                        default: true
-                      has_previous:
-                        type: boolean
-                        default: false
+                        example: 3
                     required:
-                      - number
-                      - next_page_number
-                      - previous_page_number
-                      - paginator
-                      - has_next
-                      - has_previous
+                      - page
+                      - num_pages
+                      - next_page
+                      - previous_page
+                      - per_page
+                      - total_count
                 required:
-                  - total_count
+                  - count
                   - pagination
           headers: {}
         '400':
@@ -2316,7 +2312,10 @@ paths:
                           example: '2026-04-22 12:00:46.444265'
                         public_ip:
                           type: string
-                          description: Public IP address of the host.
+                          nullable: true
+                          description: >-
+                            Public IP address of the host. Null until the
+                            deployment is placed on a host.
                           example: 100.10.0.85
                         ports:
                           type: object
@@ -5652,6 +5651,13 @@ components:
           description: Enable encryption at rest to prevent reading the value with API.
           default: false
           example: false
+        is_secret:
+          type: boolean
+          readOnly: true
+          description: >-
+            Returned when reading an app version, set for variables stored
+            encrypted. Send is_hidden when writing.
+          example: false
       type: object
     V1DeployFilter:
       type: object
@@ -5739,7 +5745,10 @@ components:
           example: c0653765de3b.pr.edgegap.net
         public_ip:
           type: string
-          description: Public IP address of the host.
+          nullable: true
+          description: >-
+            Public IP address of the host. Null until the deployment is placed
+            on a host.
           example: 192.53.120.48
         app_name:
           type: string
@@ -5776,8 +5785,9 @@ components:
           example: 1440
         removal_time:
           type: string
-          description: Timestamp of deployment stopped.
+          description: Timestamp of deployment stopped. Null while running.
           format: date-time
+          nullable: true
           example: '2026-04-22 12:00:46.444265'
         last_status:
           type: string
@@ -5809,10 +5819,12 @@ components:
           description: List of tags to mark your deployments for easy filtering.
         command:
           type: string
+          nullable: true
           description: Overrides container command for the deployment, use with caution.
           example: echo "hi" && sleep infinity
         arguments:
           type: string
+          nullable: true
           description: Overrides container arguments for the deployment, use with caution.
       required:
         - app_name
@@ -5928,10 +5940,12 @@ components:
           example: registry.edgegap.com
         private_username:
           type: string
+          nullable: true
           description: Docker Registry username. Not your Edgegap credentials.
           example: robot$my-org-cv2l3w3vy6fg+app-version-pull
         private_token:
           type: string
+          nullable: true
           description: Docker Registry token/password. Not your Edgegap credentials.
           example: ghca3dz3foAxXf2tu2xjExtXrBOMydfC
         docker_image:
@@ -6006,6 +6020,7 @@ components:
           default: false
         dns_config:
           type: string
+          nullable: true
           description: DNS configuration identifier for custom deployment domains.
           example: my-dns-config
         ports:
@@ -6020,6 +6035,7 @@ components:
             $ref: '#/components/schemas/InjectedEnvVariable'
         endpoint_storage:
           type: string
+          nullable: true
           description: >-
             Endpoint storage identifier to upload deployment logs, overrides app
             version storage if specified.
